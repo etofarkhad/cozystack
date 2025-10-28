@@ -1,0 +1,40 @@
+apiVersion: cozystack.io/v1alpha1
+kind: CozystackResourceDefinition
+metadata:
+  name: n8n
+spec:
+  application:
+    kind: N8N
+    singular: n8n
+    plural: n8ns
+    openAPISchema: |-
+      {"title":"n8n Values","type":"object","required":["clientId","domain"],"properties":{"clientId":{"description":"Unique client identifier (used for tenant name)","type":"string"},"domain":{"description":"Domain for n8n access","type":"string"},"resources":{"description":"CPU and memory resources","type":"object","properties":{"requests":{"type":"object","properties":{"cpu":{"type":"string","default":"200m"},"memory":{"type":"string","default":"1Gi"}}},"limits":{"type":"object","properties":{"cpu":{"type":"string","default":"2"},"memory":{"type":"string","default":"2Gi"}}}}},"persistence":{"description":"Persistent storage configuration","type":"object","properties":{"enabled":{"type":"boolean","default":true},"storageClass":{"type":"string","default":"replicated"},"size":{"type":"string","default":"10Gi"}}},"n8n":{"description":"n8n specific configuration","type":"object","properties":{"image":{"type":"object","properties":{"repository":{"type":"string","default":"docker.n8n.io/n8nio/n8n"},"tag":{"type":"string","default":"1.24.1"},"pullPolicy":{"type":"string","default":"IfNotPresent"}}},"env":{"type":"object","properties":{"N8N_BASIC_AUTH_ACTIVE":{"type":"string","default":"true"},"N8N_BASIC_AUTH_USER":{"type":"string","default":"admin"},"N8N_BASIC_AUTH_PASSWORD":{"type":"string","default":"changeme"},"GENERIC_TIMEZONE":{"type":"string","default":"Europe/Moscow"}}}}},"ingress":{"description":"Ingress configuration","type":"object","properties":{"enabled":{"type":"boolean","default":true},"className":{"type":"string","default":"tenant-root"}}}}}
+  release:
+    prefix: n8n-
+    labels:
+      cozystack.io/ui: "true"
+    chart:
+      name: n8n-helm-chart
+      sourceRef:
+        kind: GitRepository
+        name: cozystack-n8n
+        namespace: cozy-public
+  dashboard:
+    category: PaaS
+    singular: n8n
+    plural: n8n Instances
+    description: Managed n8n workflow automation service
+    tags: ["workflow", "automation", "integration"]
+    icon: data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQ0IiBoZWlnaHQ9IjE0NCIgdmlld0JveD0iMCAwIDE0NCAxNDQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE0NCIgaGVpZ2h0PSIxNDQiIHJ4PSIyNCIgZmlsbD0iI0VBNEIzNSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNjAiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSJ3aGl0ZSI+bjhuPC90ZXh0Pjwvc3ZnPg==
+    keysOrder: [["apiVersion"], ["kind"], ["metadata"], ["metadata", "name"], ["spec", "clientId"], ["spec", "domain"], ["spec", "resources"], ["spec", "persistence"], ["spec", "n8n", "env", "N8N_BASIC_AUTH_USER"], ["spec", "n8n", "env", "N8N_BASIC_AUTH_PASSWORD"]]
+  secrets:
+    exclude: []
+    include:
+      - resourceNames:
+          - n8n-{{ .name }}-credentials
+  services:
+    exclude: []
+    include:
+      - resourceNames:
+          - "{{ .name }}-n8n"
+
