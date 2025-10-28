@@ -1,0 +1,14 @@
+apiVersion: v2
+name: n8n-client
+description: N8N Workflow Automation для клиентов managed hosting
+type: application
+version: 1.0.0
+appVersion: "1.24.1"
+keywords:
+  - n8n
+  - workflow
+  - automation
+maintainers:
+  - name: HostKey Team
+    email: support@hostkey.com
+

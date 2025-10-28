@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "n8n.fullname" . }}
+  namespace: {{ include "n8n.namespace" . }}
+  labels:
+    {{- include "n8n.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "n8n.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "n8n.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        runAsNonRoot: {{ .Values.n8n.securityContext.runAsNonRoot }}
+        runAsUser: {{ .Values.n8n.securityContext.runAsUser }}
+        fsGroup: {{ .Values.n8n.securityContext.fsGroup }}
+      
+      containers:
+      - name: n8n
+        image: {{ .Values.n8n.image.repository }}:{{ .Values.n8n.image.tag }}
+        imagePullPolicy: {{ .Values.n8n.image.pullPolicy }}
+        
+        securityContext:
+          allowPrivilegeEscalation: {{ .Values.n8n.securityContext.allowPrivilegeEscalation }}
+          capabilities:
+            drop:
+              {{- toYaml .Values.n8n.securityContext.capabilities.drop | nindent 14 }}
+          seccompProfile:
+            type: {{ .Values.n8n.securityContext.seccompProfile.type }}
+        
+        ports:
+        - name: http
+          containerPort: 5678
+          protocol: TCP
+        
+        env:
+        - name: N8N_EDITOR_BASE_URL
+          value: {{ include "n8n.baseUrl" . | quote }}
+        - name: WEBHOOK_URL
+          value: {{ include "n8n.baseUrl" . | quote }}
+        - name: GENERIC_TIMEZONE
+          value: {{ .Values.n8n.env.GENERIC_TIMEZONE | quote }}
+        - name: TZ
+          value: {{ .Values.n8n.env.TZ | quote }}
+        - name: EXECUTIONS_MODE
+          value: {{ .Values.n8n.env.EXECUTIONS_MODE | quote }}
+        - name: DB_TYPE
+          value: {{ .Values.n8n.env.DB_TYPE | quote }}
+        - name: DB_SQLITE_DATABASE
+          value: {{ .Values.n8n.env.DB_SQLITE_DATABASE | quote }}
+        - name: N8N_USER_FOLDER
+          value: "/home/node/.n8n"
+        
+        resources:
+          requests:
+            cpu: {{ .Values.resources.requests.cpu | quote }}
+            memory: {{ .Values.resources.requests.memory | quote }}
+          limits:
+            cpu: {{ .Values.resources.limits.cpu | quote }}
+            memory: {{ .Values.resources.limits.memory | quote }}
+        
+        volumeMounts:
+        - name: data
+          mountPath: /home/node/.n8n
+        
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      
+      volumes:
+      - name: data
+        {{- if .Values.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ include "n8n.fullname" . }}-data
+        {{- else }}
+        emptyDir: {}
+        {{- end }}

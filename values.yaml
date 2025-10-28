@@ -1,0 +1,67 @@
+clientId: "test-client"
+tenant: "n8n"
+domain: "n8n-test-client.cz.hostkey.com"
+
+letsencrypt:
+  enabled: false
+  email: "support@hostkey.com"
+
+resources:
+  requests:
+    cpu: "1"
+    memory: "1Gi"
+  limits:
+    cpu: "2"
+    memory: "2Gi"
+
+persistence:
+  enabled: true
+  storageClass: "local"
+  size: "10Gi"
+
+n8n:
+  image:
+    repository: docker.n8n.io/n8nio/n8n
+    tag: "1.24.1"
+    pullPolicy: IfNotPresent
+  
+  env:
+    N8N_EDITOR_BASE_URL: ""
+    GENERIC_TIMEZONE: "Europe/Moscow"
+    TZ: "Europe/Moscow"
+    WEBHOOK_URL: ""
+    EXECUTIONS_MODE: "regular"
+    DB_TYPE: "sqlite"
+    DB_SQLITE_DATABASE: "/home/node/.n8n/database.sqlite"
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 1000
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+
+service:
+  type: ClusterIP
+  port: 5678
+
+ingress:
+  enabled: true
+  className: "tenant-root"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+
+labels:
+  app: "n8n"
+  managed-by: "cozystack-helm"
+
+monitoring:
+  enabled: false
