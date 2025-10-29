@@ -15,16 +15,11 @@ spec:
   - Egress
   
   ingress:
+  # Только Ingress Controller из tenant-root может обращаться к N8N
   - from:
     - namespaceSelector:
         matchLabels:
           kubernetes.io/metadata.name: tenant-root
-      podSelector:
-        matchLabels:
-          app.kubernetes.io/name: ingress-nginx
-    - namespaceSelector:
-        matchLabels:
-          tenant.cozystack.io/tenant-{{ .Values.tenant }}: ""
       podSelector:
         matchLabels:
           app.kubernetes.io/name: ingress-nginx
