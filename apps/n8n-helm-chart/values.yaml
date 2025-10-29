@@ -63,5 +63,16 @@ labels:
   app: "n8n"
   managed-by: "cozystack-helm"
 
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault
+
 monitoring:
   enabled: false
