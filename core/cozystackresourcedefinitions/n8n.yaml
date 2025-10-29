@@ -14,7 +14,7 @@ spec:
     labels:
       cozystack.io/ui: "true"
     chart:
-      name: n8n-helm-chart
+      name: apps/n8n-helm-chart
       sourceRef:
         kind: GitRepository
         name: cozystack-n8n
