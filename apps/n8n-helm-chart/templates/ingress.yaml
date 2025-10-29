@@ -13,7 +13,10 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: {{ index .Values.ingress.annotations "nginx.ingress.kubernetes.io/proxy-read-timeout" | quote }}
 spec:
   ingressClassName: {{ .Values.ingress.className }}
-  
+  tls:
+  - hosts:
+    - {{ .Values.domain }}
+    secretName: {{ .Values.domain | replace "." "-" }}-tls
   rules:
   - host: {{ .Values.domain }}
     http:
