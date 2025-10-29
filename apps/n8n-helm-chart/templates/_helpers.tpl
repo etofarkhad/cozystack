@@ -1,5 +1,5 @@
 {{- define "n8n.namespace" -}}
-{{ .Release.Namespace }}
+tenant-n8n
 {{- end }}
 
 {{- define "n8n.fullname" -}}
