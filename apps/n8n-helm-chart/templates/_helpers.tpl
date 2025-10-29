@@ -1,5 +1,5 @@
 {{- define "n8n.namespace" -}}
-tenant-n8n
+tenant-{{ .Values.clientId }}
 {{- end }}
 
 {{- define "n8n.fullname" -}}
