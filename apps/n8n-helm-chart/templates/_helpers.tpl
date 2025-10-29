@@ -10,7 +10,6 @@ tenant-{{ .Values.clientId }}
 app: {{ .Values.labels.app }}
 clientId: {{ .Values.clientId }}
 managedBy: {{ index .Values.labels "managed-by" }}
-tenant.cozystack.io/tenant-{{ .Values.tenant }}: ""
 {{- end }}
 
 {{- define "n8n.selectorLabels" -}}
