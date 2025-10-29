@@ -16,7 +16,7 @@ resources:
 
 persistence:
   enabled: true
-  storageClass: "local"
+  storageClass: "replicated" 
   size: "10Gi"
 
 n8n:
