@@ -16,7 +16,7 @@ spec:
   tls:
   - hosts:
     - {{ .Values.domain }}
-    secretName: wildcard-cz-hostkey-com-tls
+    secretName: dashboard-web-tls
   rules:
   - host: {{ .Values.domain }}
     http:
