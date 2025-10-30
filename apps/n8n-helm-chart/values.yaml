@@ -1,6 +1,15 @@
 clientId: "test-client"
-tenant: "n8n"
 domain: "n8n-test-client.cz.hostkey.com"
+
+tenant:
+  name: ""  
+  parentNamespace: "tenant-root"  
+  seaweedfs: false
+  etcd: false
+  host: ""
+  ingress: false
+  isolated: true
+  monitoring: false
 
 letsencrypt:
   enabled: false
