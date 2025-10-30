@@ -1,5 +1,9 @@
+{{- define "n8n.tenantName" -}}
+{{- .Values.tenant.name | default .Values.clientId -}}
+{{- end }}
+
 {{- define "n8n.namespace" -}}
-tenant-{{ .Values.clientId }}
+tenant-{{ include "n8n.tenantName" . }}
 {{- end }}
 
 {{- define "n8n.fullname" -}}
