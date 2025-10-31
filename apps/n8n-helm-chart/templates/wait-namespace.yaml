@@ -19,10 +19,6 @@ spec:
       restartPolicy: Never
       serviceAccountName: {{ include "n8n.fullname" . }}-wait-namespace
       securityContext:
-        allowPrivilegeEscalation: false
-        capabilities:
-          drop:
-            - ALL
         seccompProfile:
           type: RuntimeDefault
       containers:
