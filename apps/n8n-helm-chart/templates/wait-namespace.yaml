@@ -18,9 +18,28 @@ spec:
     spec:
       restartPolicy: Never
       serviceAccountName: {{ include "n8n.fullname" . }}-wait-namespace
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: wait-namespace
         image: bitnami/kubectl:latest
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          runAsNonRoot: true
+          runAsUser: 1000
+          seccompProfile:
+            type: RuntimeDefault
         command:
         - /bin/sh
         - -c
