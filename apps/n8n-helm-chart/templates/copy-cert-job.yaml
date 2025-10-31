@@ -1,0 +1,93 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "n8n.fullname" . }}-copy-cert
+  namespace: {{ include "n8n.namespace" . }}
+  labels:
+    {{- include "n8n.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "4"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        {{- include "n8n.labels" . | nindent 8 }}
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: {{ include "n8n.fullname" . }}-copy-cert
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: copy-cert
+        image: bitnami/kubectl:latest
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          runAsNonRoot: false
+          runAsUser: 0
+          seccompProfile:
+            type: RuntimeDefault
+        command:
+        - /bin/bash
+        - -c
+        - |
+          echo "Копируем сертификат dashboard-web-tls из cozy-dashboard..."
+          kubectl get secret dashboard-web-tls \
+            -n cozy-dashboard \
+            -o yaml | \
+          sed "s/namespace: cozy-dashboard/namespace: {{ include "n8n.namespace" . }}/" | \
+          kubectl apply -f -
+          echo "Сертификат dashboard-web-tls успешно скопирован в namespace {{ include "n8n.namespace" . }}"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "n8n.fullname" . }}-copy-cert
+  namespace: {{ include "n8n.namespace" . }}
+  labels:
+    {{- include "n8n.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "3"
+    "helm.sh/hook-delete-policy": before-hook-creation
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "n8n.fullname" . }}-copy-cert
+  labels:
+    {{- include "n8n.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "3"
+    "helm.sh/hook-delete-policy": before-hook-creation
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "create", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "n8n.fullname" . }}-copy-cert
+  labels:
+    {{- include "n8n.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "3"
+    "helm.sh/hook-delete-policy": before-hook-creation
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "n8n.fullname" . }}-copy-cert
+subjects:
+- kind: ServiceAccount
+  name: {{ include "n8n.fullname" . }}-copy-cert
+  namespace: {{ include "n8n.namespace" . }}
+
