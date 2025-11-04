@@ -1,7 +1,7 @@
 apiVersion: apps.cozystack.io/v1alpha1
 kind: Tenant
 metadata:
-  name: {{ .Values.tenant.name | default .Values.clientId }}
+  name: {{ include "n8n.tenantName" . }}
   namespace: {{ .Values.tenant.parentNamespace | default "tenant-root" }}
   labels:
     {{- include "n8n.labels" . | nindent 4 }}
