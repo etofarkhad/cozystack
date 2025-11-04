@@ -7,7 +7,7 @@ tenant-{{ include "n8n.tenantName" . }}
 {{- end }}
 
 {{- define "n8n.fullname" -}}
-{{ .Values.clientId | toString }}-n8n
+n8n-{{ .Values.clientId | toString }}
 {{- end }}
 
 {{- define "n8n.labels" -}}
