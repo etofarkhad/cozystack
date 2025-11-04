@@ -1,5 +1,5 @@
 {{- define "n8n.tenantName" -}}
-{{- if .Values.tenant.name }}{{ .Values.tenant.name }}{{ else }}{{ .Values.clientId | quote }}{{ end }}
+{{- if .Values.tenant.name }}{{ .Values.tenant.name }}{{ else }}{{ .Values.clientId | toString }}{{ end }}
 {{- end }}
 
 {{- define "n8n.namespace" -}}
